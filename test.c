@@ -17,15 +17,16 @@ int main(int argc, char **argv)
 
     bool verbose = false;
     bool output = false;
+    words_mode mode = MODE_NONE;
     char *file = NULL;
     uint16_t count;
 
     int opt;
-    while ((opt = getopt(argc, argv, ":c:vo:")) != -1)
+    while ((opt = getopt(argc, argv, ":n:vo:ulc")) != -1)
     {
         switch (opt)
         {
-        case 'c':
+        case 'n':
             count = atol(optarg);
             break;
         case 'v':
@@ -35,6 +36,15 @@ int main(int argc, char **argv)
             output = true;
             file = optarg;
             break;
+        case 'u':
+            mode = MODE_UPPER;
+            break;
+        case 'l':
+            mode = MODE_LOWER;
+            break;
+        case 'c':
+            mode = MODE_CAPITALIZED;
+            break;
         default:
             print_usage(argv[0]);
             return 1;
@@ -43,7 +53,7 @@ int main(int argc, char **argv)
 
     srand((unsigned)time(NULL));
 
-    words *w = words_generator_create(count);
+    words *w = words_generator_create(count, mode);
 
     if (verbose)
         words_generator_print(w);
@@ -59,7 +69,10 @@ void print_usage(const char *prog)
 {
     printf("Usage: %s [-c count] [-v] [-o file]\n", prog);
     printf("Options:\n");
-    printf("  -c count   Number of iterations (max: 10000)\n");
+    printf("  -n count   Number of iterations (max: 10000)\n");
     printf("  -v         Enable verbose output\n");
     printf("  -o file    Write output to file\n");
+    printf("  -u         Uppercase only\n");
+    printf("  -l         Lowercase only\n");
+    printf("  -c         Capitalized\n");
 }

@@ -12,18 +12,35 @@ struct _words
     char **values;
 };
 
-void generate_word(char *buffer, size_t length)
+void generate_word(char *buffer, size_t length, const words_mode mode)
 {
     for (size_t i = 0; i < length - 1; i++)
     {
-        buffer[i] = 'a' + (rand() % 26);
+        switch (mode) {
+            case MODE_UPPER:
+                buffer[i] = 'A' + (rand() % 26);
+                break;
+            case MODE_LOWER:
+            case MODE_CAPITALIZED:
+                buffer[i] = 'a' + (rand() % 26);
+                break;
+            case MODE_NONE:  // mixed
+            default:
+                int r = rand() % 52;
+                buffer[i] = (r < 26) ? 'A' + r : 'a' + (r - 26);
+                break;
+        }
     }
+
+    if (mode == MODE_CAPITALIZED)
+        buffer[0] = 'A' + (buffer[0] - 'a');
+
     buffer[length - 1] = 0;
 }
 
-words *words_generator_create(uint16_t count)
+words *words_generator_create(uint16_t count, const words_mode mode)
 {
-    if (count > MAX_COUNT)
+    if (count > MAX_COUNT || count == 0)
         count = MAX_COUNT;
     printf("Creating %u words.\n", count);
 
@@ -36,7 +53,7 @@ words *words_generator_create(uint16_t count)
     const uint8_t longest_word = 15;
     for (uint16_t i = 0; i < w->size; i++)
     {
-        generate_word(buffer, shortest_word + (rand() % (longest_word - shortest_word + 1)));
+        generate_word(buffer, shortest_word + (rand() % (longest_word - shortest_word + 1)), mode);
         char *new_word = malloc(strlen(buffer) + 1);
         strcpy(new_word, buffer);
         w->values[i] = new_word;
