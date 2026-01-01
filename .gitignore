@@ -1,0 +1,8 @@
+*
+!/**/
+!*.*
+!Makefile
+
+# Libraries
+*.a
+*.so
